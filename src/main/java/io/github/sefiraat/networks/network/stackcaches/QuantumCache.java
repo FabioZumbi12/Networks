@@ -34,10 +34,16 @@ public class QuantumCache extends ItemStackCache {
     }
 
     public void setAmount(int amount) {
-        this.amount = amount;
+        this.amount = Math.max(0, Math.min(amount, this.limit));
     }
 
     public int increaseAmount(int amount) {
+        if (this.amount > this.limit) {
+            // Recover from corrupted or manually overfilled state before processing new input.
+            this.amount = this.limit;
+            return amount;
+        }
+
         long total = (long) this.amount + (long) amount;
         if (total > this.limit) {
             this.amount = this.limit;
